@@ -6,6 +6,8 @@ A python script to view pictures in your terminal.
 
 `tcv [-h] [--quiet] File [File ...]`
 
+![a screenshot](screenshot.png)
+
 ### Requirements
 
 - A terminal with:

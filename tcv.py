@@ -4,52 +4,55 @@ from PIL import Image, ImageFilter
 from statistics import median
 import shutil, argparse
 
-def print_bl(ul, ur, dl, dr, treshold = 100):
+def bilevel_block(ul, ur, dl, dr, treshold = 100):
     bools = list(map(lambda pix : pix > treshold, [ul, ur, dl, dr]))
-    print(" ▘▝▀▖▌▞▛▗▚▐▜▄▙▟█"[bools[0]+2*bools[1]+4*bools[2]+8*bools[3]], end="")
+    return " ▘▝▀▖▌▞▛▗▚▐▜▄▙▟█"[bools[0]+2*bools[1]+4*bools[2]+8*bools[3]]
 
-def print_tc(string, fg, bg):
+def truecolor_block(string, fg, bg):
     if(bg == "none"):
-        print("\x1b[38;2;{};{};{}m{}".format(fg[0], fg[1], fg[2], string), end="")
+        return "\x1b[38;2;{};{};{}m{}".format(fg[0], fg[1], fg[2], string)
     else:
-        print("\x1b[38;2;{};{};{};48;2;{};{};{}m{}".format(fg[0], fg[1], fg[2], bg[0], bg[1], bg[2], string), end="")
+        return "\x1b[38;2;{};{};{};48;2;{};{};{}m{}".format(fg[0], fg[1], fg[2], bg[0], bg[1], bg[2], string)
 
 def print_image_bl(img):
+    out = ""
     for y in range(0, img.height-1, 2):
         for x in range(0, img.width-1, 2):
             ul = img.getpixel((x  , y  ))
             ur = img.getpixel((x+1, y  ))
             dl = img.getpixel((x  , y+1))
             dr = img.getpixel((x+1, y+1))
-            print_bl(ul, ur, dl, dr)
+            out += bilevel_block(ul, ur, dl, dr)
         if(img.width % 2 == 1):
             ul = img.getpixel((img.width-1 ,y  ))
             dl = img.getpixel((img.width-1 ,y+1))
-            print_bl(ul, 0, dl, 0)
-        print()
+            out += bilevel_block(ul, 0, dl, 0)
+        out += "\n"
     if(img.height % 2 == 1):
         for x in range(0, img.width-1, 2):
             ul = img.getpixel((x   ,img.height-1))
             ur = img.getpixel((x+1 ,img.height-1))
-            print_bl(ul, ur, 0, 0)
+            out += bilevel_block(ul, ur, 0, 0)
         if(img.width % 2 == 1):
             ul = img.getpixel((img.width-1, img.height-1))
-            print_bl(ul, 0, 0, 0)
-        print()
+            out += bilevel_block(ul, 0, 0, 0)
+    print(out)
 
 def print_image_tc(img):
+    out = ""
     for y in range(0, img.height-1, 2):
         for x in range(img.width):
             upper = img.getpixel((x,y))
             lower = img.getpixel((x,y+1))
-            print_tc("▀", upper, lower)
-        print()
+            out += truecolor_block("▀", upper, lower)
+        out += "\n"
     if(img.height % 2 == 1):
-        print("\x1b[0m", end="")
+        out += "\x1b[0m"
         for x in range(img.width):
             upper = img.getpixel((x, img.height-1))
-            print_tc("▀", upper, "none")
-    print("\x1b[0m")
+            out += truecolor_block("▀", upper, "none")
+    out += "\x1b[0m"
+    print(out)
 
 def print_fitting(path):
     img      = Image.open(path)

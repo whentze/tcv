@@ -15,13 +15,13 @@ def print_image(img):
             upper = img.getpixel((x,y))
             lower = img.getpixel((x,y+1))
             print_tc("▀", upper, lower)
-        print("")
+        print("\x1b[0m")
     if(img.height % 2 == 1):
         print("\x1b[0m", end="")
         for x in range(img.width):
             upper = img.getpixel((x, img.height-1))
             print_tc("▀", upper, "none")
-    print("\x1b[0m")
+        print("\x1b[0m")
 
 def print_fitting(path):
     img      = Image.open(path)
